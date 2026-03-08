@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import { corsOptions } from "./config/cors";
 import { generalRateLimit } from "./middleware/rateLimit.middleware";
 import authRoutes from "./modules/auth/auth.routes";
+import budgetRoutes from "./modules/budget/budget.routes";
 
 const app = express();
 const httpServer = createServer(app);
@@ -24,7 +25,8 @@ app.use(express.json());
 app.use(generalRateLimit);
 
 // ── Routes ────────────────────────────────────────────────────────────
-app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/auth",   authRoutes);
+app.use("/api/v1/budget", budgetRoutes);
 
 // ── Health ────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) => {
