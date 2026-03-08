@@ -11,7 +11,7 @@ import budgetRoutes from "./modules/budget/budget.routes";
 import transactionsRoutes from "./modules/transactions/transactions.routes";
 import incomeRoutes from "./modules/income/income.routes";
 import savingsRoutes from "./modules/savings/savings.routes";
-
+import networthRoutes from "./modules/networth/networth.routes";
 
 const app = express();
 const httpServer = createServer(app);
@@ -34,6 +34,7 @@ app.use("/api/v1/budget",       budgetRoutes);
 app.use("/api/v1/transactions", transactionsRoutes);
 app.use("/api/v1/income",       incomeRoutes);
 app.use("/api/v1/savings",      savingsRoutes);
+app.use("/api/v1/networth",     networthRoutes);
 
 // ── Health ────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) => {
