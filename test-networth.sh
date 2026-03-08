@@ -133,9 +133,9 @@ RESPONSE=$(curl -s "$BASE_URL/networth" -H "Authorization: Bearer $ACCESS_TOKEN"
 SUCCESS=$(echo "$RESPONSE" | grep -o '"success":true')
 [ -n "$SUCCESS" ] && pass "Net worth summary returned" || { fail "Summary failed: $RESPONSE"; exit 1; }
 
-# cash = 100000 - 40000 = 60000
+# cash = 100000 - 40000 - 50000 (savings) = 10000
 CASH=$(echo "$RESPONSE" | grep -o '"cash":[0-9]*' | cut -d':' -f2)
-[ "$CASH" = "60000" ] && pass "Cash balance = 60000 (income 100k - expenses 40k)" || fail "Expected cash 60000, got $CASH"
+[ "$CASH" = "10000" ] && pass "Cash balance = 10000 (income 100k - expenses 40k - savings 50k)" || fail "Expected cash 10000, got $CASH"
 
 # savings = 50000
 SAVINGS=$(echo "$RESPONSE" | grep -o '"savings":[0-9]*' | cut -d':' -f2)
@@ -145,9 +145,9 @@ SAVINGS=$(echo "$RESPONSE" | grep -o '"savings":[0-9]*' | cut -d':' -f2)
 LIAB=$(echo "$RESPONSE" | grep -o '"total_liabilities":[0-9]*' | cut -d':' -f2)
 [ "$LIAB" = "795000" ] && pass "Total liabilities = 795000" || fail "Expected 795000, got $LIAB"
 
-# net worth = (60000 + 50000 + 1400000 + 5000000) - 795000 = 5715000
+# net worth = (10000 + 50000 + 1400000 + 5000000) - 795000 = 5665000
 NW=$(echo "$RESPONSE" | grep -o '"net_worth":[0-9-]*' | cut -d':' -f2)
-[ "$NW" = "5715000" ] && pass "Net worth = 5,715,000" || fail "Expected 5715000, got $NW"
+[ "$NW" = "5665000" ] && pass "Net worth = 5,665,000" || fail "Expected 5665000, got $NW"
 
 # ─────────────────────────────────────────────
 section "Delete asset and liability"

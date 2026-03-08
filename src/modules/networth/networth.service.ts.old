@@ -137,7 +137,7 @@ export async function getNetWorthSummary(userId: string) {
 
   const savingsTotal = (savingsGoals ?? []).reduce((s, g) => s + Number(g.current_amount), 0);
 
-  // 4. Auto: cash = all-time income − all-time expenses − savings contributions
+  // 4. Auto: cash = all-time income − all-time expenses
   const { data: incomeRows } = await supabase
     .from("income")
     .select("amount")
@@ -152,11 +152,7 @@ export async function getNetWorthSummary(userId: string) {
 
   const totalExpenses = (txRows ?? []).reduce((s, r) => s + Number(r.amount), 0);
 
-  // Savings contributions = sum of current_amount across all goals
-  // (what has actually been set aside, not just the target)
-  const savingsContributions = savingsTotal;
-
-  const cashBalance = Math.max(totalIncome - totalExpenses - savingsContributions, 0);
+  const cashBalance = Math.max(totalIncome - totalExpenses, 0);
 
   // 5. Totals
   const manualAssetsTotal     = (assets ?? []).reduce((s, a) => s + Number(a.value), 0);
