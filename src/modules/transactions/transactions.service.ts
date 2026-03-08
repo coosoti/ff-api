@@ -7,7 +7,7 @@ export async function createTransaction(
   payload: {
     category_id?: string;
     amount: number;
-    type: "income" | "expense";
+    type: "expense";
     date: string;
     notes?: string;
   }

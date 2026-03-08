@@ -126,7 +126,6 @@ export async function recalculateBudget(userId: string, monthlyIncome: number) {
 // ── US-008: Monthly budget summary ───────────────────────────────────
 
 export async function getBudgetSummary(userId: string, month: string) {
-  // month format: "2026-03"
   const startDate = `${month}-01`;
   const endDate = new Date(new Date(startDate).setMonth(new Date(startDate).getMonth() + 1))
     .toISOString()
@@ -150,12 +149,26 @@ export async function getBudgetSummary(userId: string, month: string) {
 
   if (txError) throw new Error(txError.message);
 
-  // Sum actual spend per category
+  // Sum actual spend per category (expenses only)
   const actuals: Record<string, number> = {};
+  let totalIncomeThisMonth = 0;
+
   for (const tx of transactions ?? []) {
     if (tx.type === "expense") {
       actuals[tx.category_id] = (actuals[tx.category_id] ?? 0) + Number(tx.amount);
+    } else if (tx.type === "income") {
+      totalIncomeThisMonth += Number(tx.amount);
     }
+  }
+
+  // Fall back to profile monthly_income if no income transactions logged yet
+  if (totalIncomeThisMonth === 0) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("monthly_income")
+      .eq("id", userId)
+      .single();
+    totalIncomeThisMonth = Number(profile?.monthly_income ?? 0);
   }
 
   // Build summary rows
@@ -169,11 +182,12 @@ export async function getBudgetSummary(userId: string, month: string) {
   // Totals by type
   const summary = {
     month,
+    total_income: totalIncomeThisMonth,
     categories: rows,
     totals: {
-      needs:   { budgeted: 0, actual: 0 },
-      wants:   { budgeted: 0, actual: 0 },
-      savings: { budgeted: 0, actual: 0 },
+      needs:   { budgeted: 0, actual: 0, target: Math.round(totalIncomeThisMonth * 0.5) },
+      wants:   { budgeted: 0, actual: 0, target: Math.round(totalIncomeThisMonth * 0.3) },
+      savings: { budgeted: 0, actual: 0, target: Math.round(totalIncomeThisMonth * 0.2) },
     },
   };
 

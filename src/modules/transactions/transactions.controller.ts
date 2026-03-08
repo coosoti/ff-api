@@ -13,7 +13,7 @@ import {
 const TransactionSchema = z.object({
   category_id:  z.string().uuid().optional(),
   amount:       z.number().positive(),
-  type:         z.enum(["income", "expense"]),
+  type:         z.literal("expense"),
   date:         z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "date must be YYYY-MM-DD"),
   notes:        z.string().optional(),
 });
