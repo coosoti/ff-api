@@ -151,17 +151,24 @@ export async function getBudgetSummary(userId: string, month: string) {
 
   // Sum actual spend per category (expenses only)
   const actuals: Record<string, number> = {};
-  let totalIncomeThisMonth = 0;
-
   for (const tx of transactions ?? []) {
-    if (tx.type === "expense") {
-      actuals[tx.category_id] = (actuals[tx.category_id] ?? 0) + Number(tx.amount);
-    } else if (tx.type === "income") {
-      totalIncomeThisMonth += Number(tx.amount);
-    }
+    actuals[tx.category_id] = (actuals[tx.category_id] ?? 0) + Number(tx.amount);
   }
 
-  // Fall back to profile monthly_income if no income transactions logged yet
+  // Get total income from income table for this month
+  const { data: incomeRows, error: incomeError } = await supabase
+    .from("income")
+    .select("amount")
+    .eq("user_id", userId)
+    .eq("month", month);
+
+  console.log("[budget summary] userId:", userId, "month:", month);
+  console.log("[budget summary] incomeRows:", incomeRows, "error:", incomeError);
+
+  let totalIncomeThisMonth = (incomeRows ?? []).reduce((sum, r) => sum + Number(r.amount), 0);
+  console.log("[budget summary] totalIncomeThisMonth:", totalIncomeThisMonth);
+
+  // Fall back to profile monthly_income if no income logged yet
   if (totalIncomeThisMonth === 0) {
     const { data: profile } = await supabase
       .from("profiles")

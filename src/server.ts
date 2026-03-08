@@ -9,6 +9,7 @@ import { generalRateLimit } from "./middleware/rateLimit.middleware";
 import authRoutes from "./modules/auth/auth.routes";
 import budgetRoutes from "./modules/budget/budget.routes";
 import transactionsRoutes from "./modules/transactions/transactions.routes";
+import incomeRoutes from "./modules/income/income.routes";
 
 const app = express();
 const httpServer = createServer(app);
@@ -29,6 +30,7 @@ app.use(generalRateLimit);
 app.use("/api/v1/auth",         authRoutes);
 app.use("/api/v1/budget",       budgetRoutes);
 app.use("/api/v1/transactions", transactionsRoutes);
+app.use("/api/v1/income",       incomeRoutes);
 
 // ── Health ────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) => {
