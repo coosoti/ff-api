@@ -158,23 +158,43 @@ export async function getNetWorthSummary(userId: string) {
 
   const cashBalance = Math.max(totalIncome - totalExpenses - savingsContributions, 0);
 
-  // 5. Totals
-  const manualAssetsTotal     = (assets ?? []).reduce((s, a) => s + Number(a.value), 0);
+  // 5. Auto: investments current value
+  const { data: investmentRows } = await supabase
+    .from("investments")
+    .select("id, name, type, current_value, total_invested")
+    .eq("user_id", userId);
+
+  const investmentsTotal = (investmentRows ?? []).reduce((s, i) => s + Number(i.current_value), 0);
+
+  // 6. Auto: pension accounts total value
+  const { data: pensionRows } = await supabase
+    .from("pension_accounts")
+    .select("id, provider, scheme_name, total_value")
+    .eq("user_id", userId);
+
+  const pensionTotal = (pensionRows ?? []).reduce((s, p) => s + Number(p.total_value), 0);
+
+  // 7. Totals
+  const manualAssetsTotal      = (assets ?? []).reduce((s, a) => s + Number(a.value), 0);
   const manualLiabilitiesTotal = (liabilities ?? []).reduce((s, l) => s + Number(l.balance), 0);
-  const totalAssets            = cashBalance + savingsTotal + manualAssetsTotal;
-  const netWorth               = totalAssets - manualLiabilitiesTotal;
+  const totalAssets             = cashBalance + savingsTotal + manualAssetsTotal + investmentsTotal + pensionTotal;
+  const netWorth                = totalAssets - manualLiabilitiesTotal;
 
   return {
-    net_worth:     netWorth,
-    total_assets:  totalAssets,
+    net_worth:         netWorth,
+    total_assets:      totalAssets,
     total_liabilities: manualLiabilitiesTotal,
     breakdown: {
-      cash:     cashBalance,
-      savings:  savingsTotal,
-      assets:   manualAssetsTotal,
+      cash:        cashBalance,
+      savings:     savingsTotal,
+      assets:      manualAssetsTotal,
+      investments: investmentsTotal,
+      pension:     pensionTotal,
     },
-    assets:      assets ?? [],
-    liabilities: liabilities ?? [],
+    assets:        assets ?? [],
+    liabilities:   liabilities ?? [],
     savings_goals: savingsGoals ?? [],
+    investments:   investmentRows ?? [],
+    pension:       pensionRows ?? [],
   };
 }
