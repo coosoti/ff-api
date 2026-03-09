@@ -6,6 +6,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { corsOptions } from "./config/cors";
 import { generalRateLimit } from "./middleware/rateLimit.middleware";
+import { requestLogger } from "./middleware/logger.middleware";
 import authRoutes from "./modules/auth/auth.routes";
 import budgetRoutes from "./modules/budget/budget.routes";
 import transactionsRoutes from "./modules/transactions/transactions.routes";
@@ -30,6 +31,7 @@ app.use(express.json());
 app.use(generalRateLimit);
 
 // ── Routes ────────────────────────────────────────────────────────────
+app.use(requestLogger);
 app.use("/api/v1/auth",         authRoutes);
 app.use("/api/v1/budget",       budgetRoutes);
 app.use("/api/v1/transactions", transactionsRoutes);
