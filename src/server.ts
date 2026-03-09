@@ -16,6 +16,7 @@ import networthRoutes from "./modules/networth/networth.routes";
 import investmentsRoutes from "./modules/investments/investments.routes";
 import pensionRoutes from "./modules/pension/pension.routes";
 import analyticsRoutes from "./modules/analytics/analytics.routes";
+import billsRoutes from "./modules/bills/bills.routes";
 
 const app = express();
 const httpServer = createServer(app);
@@ -43,6 +44,7 @@ app.use("/api/v1/networth",     networthRoutes);
 app.use("/api/v1/investments",  investmentsRoutes);
 app.use("/api/v1/pension",      pensionRoutes);
 app.use("/api/v1/analytics",   analyticsRoutes);
+app.use("/api/v1/bills",       billsRoutes);
 
 // ── Health ────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) => {
